@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAHARI – Contacto</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- ANNOUNCEMENT BAR -->
+  <div class="announcement-bar">
+    🔥 &nbsp;<strong>Envíos Gratis a Todo Chile</strong>&nbsp; 🚀
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="productos.html">Productos</a></li>
+      <li><a href="contacto.html" class="active">Contacto</a></li>
+    </ul>
+
+    <div class="nav-logo">
+      <a href="index.html">
+        <img src="img/logo.png" alt="SAHARI Logo" />
+      </a>
+    </div>
+
+    <div class="nav-icons">
+      <a href="#" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></a>
+      <a href="#" aria-label="Cuenta"><i class="fa-regular fa-user"></i></a>
+      <a href="#" aria-label="Carrito"><i class="fa-solid fa-bag-shopping"></i></a>
+    </div>
+  </nav>
+
+  <!-- CONTACT FORM -->
+  <div class="contact-container">
+    <h1>Contacto</h1>
+
+    <div class="contact-form" id="contactForm">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" class="form-control" placeholder="" />
+        </div>
+        <div class="form-group">
+          <label for="email">Correo electrónico *</label>
+          <input type="email" id="email" class="form-control" placeholder="" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Número de teléfono</label>
+        <input type="tel" id="telefono" class="form-control" placeholder="" />
+      </div>
+
+      <div class="form-group">
+        <label for="comentario">Comentario</label>
+        <textarea id="comentario" class="form-control" placeholder=""></textarea>
+      </div>
+
+      <button class="btn-submit" onclick="enviarFormulario()">Enviar</button>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast">
+    <div class="toast-icon">✅</div>
+    <div class="toast-text">
+      <strong>¡Mensaje enviado correctamente!</strong>
+      <span>Nos pondremos en contacto contigo pronto.</span>
+    </div>
+  </div>
+
+  <script>
+    const N8N_WEBHOOK_URL = 'https://tu-n8n.com/webhook/sahari-contacto'; // ← Reemplaza con tu URL de n8n
+
+    async function enviarFormulario() {
+      const nombre    = document.getElementById('nombre').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const telefono  = document.getElementById('telefono').value.trim();
+      const comentario = document.getElementById('comentario').value.trim();
+
+      // Validación básica
+      if (!email) {
+        mostrarToast('error', '⚠️ El correo electrónico es obligatorio.');
+        return;
+      }
+
+      const datos = { nombre, email, telefono, comentario };
+
+      // Vista previa de datos (simulación mientras no está n8n conectado)
+      console.log('📤 Datos que se enviarán a n8n:', datos);
+
+      try {
+        // Llamada real a n8n (descomenta cuando tengas el webhook)
+        /*
+        const response = await fetch(N8N_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+        if (!response.ok) throw new Error('Error en el servidor');
+        */
+
+        // POR AHORA: simulamos el envío exitoso
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        // Mostramos toast de éxito
+        mostrarToast('success');
+
+        // Limpiamos el formulario
+        document.getElementById('nombre').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('telefono').value = '';
+        document.getElementById('comentario').value = '';
+
+      } catch (err) {
+        console.error('Error al enviar:', err);
+        mostrarToast('error', '❌ Ocurrió un error. Intenta nuevamente.');
+      }
+    }
+
+    function mostrarToast(tipo, mensajePersonalizado) {
+      const toast = document.getElementById('toast');
+
+      if (tipo === 'error') {
+        toast.innerHTML = `
+          <div class="toast-icon">⚠️</div>
+          <div class="toast-text">
+            <strong>${mensajePersonalizado || 'Error al enviar'}</strong>
+            <span>Por favor revisa los datos ingresados.</span>
+          </div>`;
+        toast.style.background = '#c0392b';
+      } else {
+        toast.innerHTML = `
+          <div class="toast-icon">✅</div>
+          <div class="toast-text">
+            <strong>¡Mensaje enviado correctamente!</strong>
+            <span>Nos pondremos en contacto contigo pronto.</span>
+          </div>`;
+        toast.style.background = '#1a1a1a';
+      }
+
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+  </script>
+
+</body>
+</html>
