@@ -78,7 +78,7 @@
   </div>
 
   <script>
-    const N8N_WEBHOOK_URL = 'https://tu-n8n.com/webhook/sahari-contacto'; // ← Reemplaza con tu URL de n8n
+    const N8N_WEBHOOK_URL = "https://cheigion.app.n8n.cloud/webhook-test/contacto-sahari"; // ← Reemplaza con tu URL de n8n
 
     async function enviarFormulario() {
       const nombre    = document.getElementById('nombre').value.trim();
@@ -98,15 +98,14 @@
       console.log('📤 Datos que se enviarán a n8n:', datos);
 
       try {
-        // Llamada real a n8n (descomenta cuando tengas el webhook)
-        /*
+        
         const response = await fetch(N8N_WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(datos)
         });
         if (!response.ok) throw new Error('Error en el servidor');
-        */
+        
 
         // POR AHORA: simulamos el envío exitoso
         await new Promise(resolve => setTimeout(resolve, 600));
