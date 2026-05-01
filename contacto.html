@@ -37,131 +37,44 @@
   </nav>
 
   <!-- CONTACT FORM -->
+  <!-- Sin fetch ni JavaScript — el form envía directo al webhook de n8n -->
+  <!-- Los campos llegan a n8n como: $json.nombre / $json.email / $json.telefono / $json.comentario -->
   <div class="contact-container">
     <h1>Contacto</h1>
 
-    <div class="contact-form" id="contactForm">
+    <form
+      class="contact-form"
+      id="contactForm"
+      action="https://cheigion.app.n8n.cloud/webhook/d8a69e26-d628-4152-a91a-46341d0839e7"
+      method="POST"
+      enctype="application/x-www-form-urlencoded"
+    >
 
       <div class="form-row">
         <div class="form-group">
           <label for="nombre">Nombre</label>
-          <input type="text" id="nombre" class="form-control" placeholder="" />
+          <input type="text" id="nombre" name="nombre" class="form-control" />
         </div>
         <div class="form-group">
           <label for="email">Correo electrónico *</label>
-          <input type="email" id="email" class="form-control" placeholder="" required />
+          <input type="email" id="email" name="email" class="form-control" required />
         </div>
       </div>
 
       <div class="form-group">
         <label for="telefono">Número de teléfono</label>
-        <input type="tel" id="telefono" class="form-control" placeholder="" />
+        <input type="tel" id="telefono" name="telefono" class="form-control" />
       </div>
 
       <div class="form-group">
         <label for="comentario">Comentario</label>
-        <textarea id="comentario" class="form-control" placeholder=""></textarea>
+        <textarea id="comentario" name="comentario" class="form-control"></textarea>
       </div>
 
-      <button class="btn-submit" id="btnEnviar" onclick="enviarFormulario()">Enviar</button>
+      <button class="btn-submit" type="submit">Enviar</button>
 
-    </div>
+    </form>
   </div>
-
-  <!-- TOAST NOTIFICATION -->
-  <div class="toast" id="toast">
-    <div class="toast-icon">✅</div>
-    <div class="toast-text">
-      <strong>¡Mensaje enviado correctamente!</strong>
-      <span>Nos pondremos en contacto contigo pronto.</span>
-    </div>
-  </div>
-
-  <script>
-    // ─────────────────────────────────────────────────────────────
-    // 🔗 URL de producción del webhook n8n
-    //    (cambia "webhook-test" por "webhook" cuando actives el flujo)
-    // ─────────────────────────────────────────────────────────────
-    const N8N_WEBHOOK_URL = "https://cheigion.app.n8n.cloud/webhook/d8a69e26-d628-4152-a91a-46341d0839e7";
-
-    async function enviarFormulario() {
-      const btn        = document.getElementById('btnEnviar');
-      const nombre     = document.getElementById('nombre').value.trim();
-      const email      = document.getElementById('email').value.trim();
-      const telefono   = document.getElementById('telefono').value.trim();
-      const comentario = document.getElementById('comentario').value.trim();
-
-      // Validación básica
-      if (!email) {
-        mostrarToast('error', '⚠️ El correo electrónico es obligatorio.');
-        return;
-      }
-
-      // JSON que recibirá n8n — accede a estos campos con:
-      //   {{ $json.nombre }}  {{ $json.email }}
-      //   {{ $json.telefono }} {{ $json.comentario }}
-      const datos = {
-        nombre:     nombre,
-        email:      email,
-        telefono:   telefono,
-        comentario: comentario
-      };
-
-      // Deshabilitar botón mientras se envía
-      btn.disabled    = true;
-      btn.textContent = 'Enviando...';
-
-      try {
-        const response = await fetch(N8N_WEBHOOK_URL, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify(datos)
-        });
-
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        // Éxito: mostramos toast y limpiamos formulario
-        mostrarToast('success');
-        document.getElementById('nombre').value     = '';
-        document.getElementById('email').value      = '';
-        document.getElementById('telefono').value   = '';
-        document.getElementById('comentario').value = '';
-
-      } catch (err) {
-        console.error('Error al enviar a n8n:', err);
-        mostrarToast('error', '❌ Ocurrió un error. Intenta nuevamente.');
-      } finally {
-        // Restaurar botón siempre
-        btn.disabled    = false;
-        btn.textContent = 'Enviar';
-      }
-    }
-
-    function mostrarToast(tipo, mensajePersonalizado) {
-      const toast = document.getElementById('toast');
-
-      if (tipo === 'error') {
-        toast.innerHTML = `
-          <div class="toast-icon">⚠️</div>
-          <div class="toast-text">
-            <strong>${mensajePersonalizado || 'Error al enviar'}</strong>
-            <span>Por favor revisa los datos ingresados.</span>
-          </div>`;
-        toast.style.background = '#c0392b';
-      } else {
-        toast.innerHTML = `
-          <div class="toast-icon">✅</div>
-          <div class="toast-text">
-            <strong>¡Mensaje enviado correctamente!</strong>
-            <span>Nos pondremos en contacto contigo pronto.</span>
-          </div>`;
-        toast.style.background = '#1a1a1a';
-      }
-
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 4000);
-    }
-  </script>
 
 </body>
 </html>
