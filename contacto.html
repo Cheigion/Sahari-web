@@ -63,7 +63,7 @@
         <textarea id="comentario" class="form-control" placeholder=""></textarea>
       </div>
 
-      <button class="btn-submit" onclick="enviarFormulario()">Enviar</button>
+      <button class="btn-submit" id="btnEnviar" onclick="enviarFormulario()">Enviar</button>
 
     </div>
   </div>
@@ -78,12 +78,17 @@
   </div>
 
   <script>
-    const N8N_WEBHOOK_URL = "https://cheigion.app.n8n.cloud/webhook-test/contacto-sahari"; // ← Reemplaza con tu URL de n8n
+    // ─────────────────────────────────────────────────────────────
+    // 🔗 URL de producción del webhook n8n
+    //    (cambia "webhook-test" por "webhook" cuando actives el flujo)
+    // ─────────────────────────────────────────────────────────────
+    const N8N_WEBHOOK_URL = "https://cheigion.app.n8n.cloud/webhook/d8a69e26-d628-4152-a91a-46341d0839e7";
 
     async function enviarFormulario() {
-      const nombre    = document.getElementById('nombre').value.trim();
-      const email     = document.getElementById('email').value.trim();
-      const telefono  = document.getElementById('telefono').value.trim();
+      const btn        = document.getElementById('btnEnviar');
+      const nombre     = document.getElementById('nombre').value.trim();
+      const email      = document.getElementById('email').value.trim();
+      const telefono   = document.getElementById('telefono').value.trim();
       const comentario = document.getElementById('comentario').value.trim();
 
       // Validación básica
@@ -92,36 +97,43 @@
         return;
       }
 
-      const datos = { nombre, email, telefono, comentario };
+      // JSON que recibirá n8n — accede a estos campos con:
+      //   {{ $json.nombre }}  {{ $json.email }}
+      //   {{ $json.telefono }} {{ $json.comentario }}
+      const datos = {
+        nombre:     nombre,
+        email:      email,
+        telefono:   telefono,
+        comentario: comentario
+      };
 
-      // Vista previa de datos (simulación mientras no está n8n conectado)
-      console.log('📤 Datos que se enviarán a n8n:', datos);
+      // Deshabilitar botón mientras se envía
+      btn.disabled    = true;
+      btn.textContent = 'Enviando...';
 
       try {
-        
         const response = await fetch(N8N_WEBHOOK_URL, {
-          method: 'POST',
+          method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(datos)
+          body:    JSON.stringify(datos)
         });
-        if (!response.ok) throw new Error('Error en el servidor');
-        
 
-        // POR AHORA: simulamos el envío exitoso
-        await new Promise(resolve => setTimeout(resolve, 600));
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-        // Mostramos toast de éxito
+        // Éxito: mostramos toast y limpiamos formulario
         mostrarToast('success');
-
-        // Limpiamos el formulario
-        document.getElementById('nombre').value = '';
-        document.getElementById('email').value = '';
-        document.getElementById('telefono').value = '';
+        document.getElementById('nombre').value     = '';
+        document.getElementById('email').value      = '';
+        document.getElementById('telefono').value   = '';
         document.getElementById('comentario').value = '';
 
       } catch (err) {
-        console.error('Error al enviar:', err);
+        console.error('Error al enviar a n8n:', err);
         mostrarToast('error', '❌ Ocurrió un error. Intenta nuevamente.');
+      } finally {
+        // Restaurar botón siempre
+        btn.disabled    = false;
+        btn.textContent = 'Enviar';
       }
     }
 
