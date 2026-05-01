@@ -7,28 +7,28 @@
     action="https://cheigion.app.n8n.cloud/webhook/d8a69e26-d628-4152-a91a-46341d0839e7"
     method="GET"
     target="hiddenFrame"
-    onsubmit="handleSubmit()"
+    onsubmit="handleSubmit(event)"
   >
 
     <div class="form-row">
       <div class="form-group">
-        <label>Nombre</label>
-        <input type="text" class="form-control" />
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" class="form-control" />
       </div>
       <div class="form-group">
-        <label>Correo electrónico *</label>
-        <input type="email" class="form-control" required />
+        <label for="email">Correo electrónico *</label>
+        <input type="email" id="email" class="form-control" required />
       </div>
     </div>
 
     <div class="form-group">
-      <label>Número de teléfono</label>
-      <input type="tel" class="form-control" />
+      <label for="telefono">Número de teléfono</label>
+      <input type="tel" id="telefono" class="form-control" />
     </div>
 
     <div class="form-group">
-      <label>Comentario</label>
-      <textarea class="form-control"></textarea>
+      <label for="comentario">Comentario</label>
+      <textarea id="comentario" class="form-control"></textarea>
     </div>
 
     <button type="submit" class="btn-submit" id="btnEnviar">
@@ -51,30 +51,46 @@
 </div>
 
 <script>
-  function handleSubmit() {
+  function handleSubmit(e) {
     const btn = document.getElementById('btnEnviar');
+    const email = document.getElementById('email').value.trim();
 
-    // Estado cargando
+    // Validación básica
+    if (!email) {
+      e.preventDefault();
+      mostrarToast('error', '⚠️ El correo electrónico es obligatorio.');
+      return;
+    }
+
+    // Estado loading
     btn.disabled = true;
     btn.textContent = 'Enviando...';
 
-    // Simulamos respuesta (porque GET + iframe no devuelve estado fácil)
+    // Como usamos GET + iframe, no podemos leer respuesta real
+    // Simulamos éxito (UX limpia tipo ecommerce)
     setTimeout(() => {
       mostrarToast('success');
+
+      // limpiar campos
+      document.getElementById('nombre').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('telefono').value = '';
+      document.getElementById('comentario').value = '';
+
       btn.disabled = false;
       btn.textContent = 'Enviar';
     }, 800);
   }
 
-  function mostrarToast(tipo) {
+  function mostrarToast(tipo, mensajePersonalizado) {
     const toast = document.getElementById('toast');
 
     if (tipo === 'error') {
       toast.innerHTML = `
         <div class="toast-icon">⚠️</div>
         <div class="toast-text">
-          <strong>Error al enviar</strong>
-          <span>Intenta nuevamente.</span>
+          <strong>${mensajePersonalizado || 'Error al enviar'}</strong>
+          <span>Por favor revisa los datos ingresados.</span>
         </div>`;
       toast.style.background = '#c0392b';
     } else {
