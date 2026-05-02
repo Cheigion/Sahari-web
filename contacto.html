@@ -99,18 +99,23 @@
     btn.disabled = true;
     btn.textContent = 'Enviando...';
 
-    try {
-      // 🔥 AQUÍ ESTÁ LA MAGIA (GET SIN REDIRECCIÓN)
-      const params = new URLSearchParams({
-        nombre,
-        email,
-        telefono,
-        comentario
-      });
+    const token = "SECRETO_123";
 
-      const response = await fetch(`${N8N_WEBHOOK_URL}?${params.toString()}`, {
-        method: 'GET'
-      });
+    try {
+      // 🔥 AQUÍ ESTÁ LA MAGIA (POST SIN REDIRECCIÓN)
+      const response = await fetch(N8N_WEBHOOK_URL, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    nombre,
+    email,
+    telefono,
+    comentario,
+    token
+  })
+});
 
       if (!response.ok) throw new Error('Error en webhook');
 
