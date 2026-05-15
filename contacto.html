@@ -10,25 +10,21 @@
 </head>
 <body>
 
-  <!-- ANNOUNCEMENT BAR -->
   <div class="announcement-bar">
     🔥 &nbsp;<strong>Envíos Gratis a Todo Chile</strong>&nbsp; 🚀
   </div>
 
-  <!-- NAVBAR -->
   <nav class="navbar">
     <ul class="nav-links">
       <li><a href="index.html">Inicio</a></li>
       <li><a href="productos.html">Productos</a></li>
       <li><a href="contacto.html" class="active">Contacto</a></li>
     </ul>
-
     <div class="nav-logo">
       <a href="index.html">
         <img src="img/logo.png" alt="SAHARI Logo" />
       </a>
     </div>
-
     <div class="nav-icons">
       <a href="#" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></a>
       <a href="#" aria-label="Cuenta"><i class="fa-regular fa-user"></i></a>
@@ -36,12 +32,9 @@
     </div>
   </nav>
 
-  <!-- CONTACT FORM -->
   <div class="contact-container">
     <h1>Contacto</h1>
-
     <div class="contact-form" id="contactForm">
-
       <div class="form-row">
         <div class="form-group">
           <label for="nombre">Nombre</label>
@@ -52,79 +45,69 @@
           <input type="email" id="email" class="form-control" placeholder="" required />
         </div>
       </div>
-
       <div class="form-group">
-        <label for="telefono">Número de teléfono</label>
-        <input type="tel" id="telefono" class="form-control" placeholder="" />
+        <label for="telefono">Número de teléfono *</label>
+        <input type="tel" id="telefono" class="form-control" placeholder="Ej: 912345678" />
       </div>
-
       <div class="form-group">
         <label for="producto">Producto</label>
         <textarea id="producto" class="form-control" placeholder=""></textarea>
       </div>
-
-   <button type="button" class="btn-submit" onclick="enviarFormulario()" id="btnEnviar">
-  Pagar Al Recibir
-</button>
-
+      <button type="button" class="btn-submit" onclick="enviarFormulario()" id="btnEnviar">
+        Pagar Al Recibir
+      </button>
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
   <div class="toast" id="toast">
     <div class="toast-icon">✅</div>
     <div class="toast-text">
-      <strong>¡Mensaje enviado correctamente!</strong>
-      <span>Nos pondremos en contacto contigo pronto.</span>
+      <strong>¡Pedido enviado!</strong>
+      <span>Te llegará un WhatsApp para confirmar.</span>
     </div>
   </div>
 
   <script>
-  const N8N_WEBHOOK_URL = "https://cheigion.app.n8n.cloud/webhook/6eab200a-a5a0-4a4d-9e7c-3f4be46780cc";
+  // ⚠️ REEMPLAZA con tu URL de Railway cuando la tengas
+  const RAILWAY_URL = "https://TU-PROYECTO.up.railway.app/pedido";
 
   async function enviarFormulario() {
-    const nombre    = document.getElementById('nombre').value.trim();
-    const email     = document.getElementById('email').value.trim();
-    const telefono  = document.getElementById('telefono').value.trim();
+    const nombre   = document.getElementById('nombre').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
     const producto = document.getElementById('producto').value.trim();
-    const btn = document.querySelector('.btn-submit');
+    const btn      = document.getElementById('btnEnviar');
 
-    // Validación
     if (!email) {
       mostrarToast('error', '⚠️ El correo electrónico es obligatorio.');
       return;
     }
+    if (!telefono) {
+      mostrarToast('error', '⚠️ El número de teléfono es obligatorio.');
+      return;
+    }
 
-    // Estado loading
     btn.disabled = true;
     btn.textContent = 'Enviando...';
 
-    const token = "SECRETO_123";
-
     try {
-      // 🔥 AQUÍ ESTÁ LA MAGIA (POST SIN REDIRECCIÓN)
-      const response = await fetch(N8N_WEBHOOK_URL, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    nombre,
-    email,
-    telefono,
-    producto,
-    token
-  })
-});
+      const response = await fetch(RAILWAY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre,
+          email,
+          telefono,
+          producto,
+          token: "SECRETO_123"
+        })
+      });
 
-      if (!response.ok) throw new Error('Error en webhook');
+      if (!response.ok) throw new Error('Error en servidor');
 
-      // éxito real
       mostrarToast('success');
-
-      // limpiar
-      document.getElementById('nombre').value = '';
-      document.getElementById('email').value = '';
+      document.getElementById('nombre').value   = '';
+      document.getElementById('email').value    = '';
       document.getElementById('telefono').value = '';
       document.getElementById('producto').value = '';
 
@@ -133,13 +116,12 @@
       mostrarToast('error', '❌ Error al enviar. Intenta nuevamente.');
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Enviar';
+      btn.textContent = 'Pagar Al Recibir';
     }
   }
 
   function mostrarToast(tipo, mensajePersonalizado) {
     const toast = document.getElementById('toast');
-
     if (tipo === 'error') {
       toast.innerHTML = `
         <div class="toast-icon">⚠️</div>
@@ -152,16 +134,15 @@
       toast.innerHTML = `
         <div class="toast-icon">✅</div>
         <div class="toast-text">
-          <strong>¡Mensaje enviado correctamente!</strong>
-          <span>Nos pondremos en contacto contigo pronto.</span>
+          <strong>¡Pedido enviado! 🎉</strong>
+          <span>Te llegará un WhatsApp para confirmar tu pedido.</span>
         </div>`;
       toast.style.background = '#1a1a1a';
     }
-
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 4000);
   }
-</script>
+  </script>
 
 </body>
 </html>
